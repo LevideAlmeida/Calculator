@@ -23,4 +23,3 @@ class MainWindow(QMainWindow):
 
     def addWidgetToLayout(self, widget: QWidget):
         self.gridLayout.addWidget(widget)
-        self.adjustFixedSize()
