@@ -6,7 +6,7 @@ from main_window import MainWindow
 from variables import ICON_PATH
 from display import Display
 from style import setupTheme
-from buttons import Button
+from buttons import ButtonsGrid
 
 if __name__ == '__main__':
 
@@ -24,22 +24,15 @@ if __name__ == '__main__':
 
     # last equation info
     last_equation = Info('2.0 ^ 10.0 = 1024')
-    window.gridLayout.addWidget(last_equation)
+    window.vLayout.addWidget(last_equation)
 
     # Add Display
     display = Display()
     window.addWidgetToLayout(display)
 
-    # Buttons
-    plus_button = Button('+')
-    minus_button = Button('-')
-    times_button = Button('*')
-    division_button = Button('/')
-
-    window.addWidgetToLayout(plus_button)
-    window.addWidgetToLayout(minus_button)
-    window.addWidgetToLayout(times_button)
-    window.addWidgetToLayout(division_button)
+    # Buttons grid
+    buttonsgrid = ButtonsGrid(display)
+    window.vLayout.addLayout(buttonsgrid)
 
     # Run
     window.adjustFixedSize()

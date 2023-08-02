@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QWidget, QGridLayout
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
 from typing import Union
 
 
@@ -10,9 +10,9 @@ class MainWindow(QMainWindow):
         self.cw = QWidget()
         self.setCentralWidget(self.cw)
 
-        self.gridLayout = QGridLayout()
+        self.vLayout = QVBoxLayout()
 
-        self.cw.setLayout(self.gridLayout)
+        self.cw.setLayout(self.vLayout)
 
         # Set title
         self.setWindowTitle('Calculator')
@@ -22,4 +22,4 @@ class MainWindow(QMainWindow):
         self.setFixedSize(self.width(), self.height())
 
     def addWidgetToLayout(self, widget: QWidget):
-        self.gridLayout.addWidget(widget)
+        self.vLayout.addWidget(widget)
