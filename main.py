@@ -23,15 +23,15 @@ if __name__ == '__main__':
     app.setWindowIcon(icon)
 
     # last equation info
-    last_equation = Info('2.0 ^ 10.0 = 1024')
-    window.vLayout.addWidget(last_equation)
+    info = Info('Sua conta')
+    window.vLayout.addWidget(info)
 
     # Add Display
     display = Display()
     window.addWidgetToLayout(display)
 
     # Buttons grid
-    buttonsgrid = ButtonsGrid(display)
+    buttonsgrid = ButtonsGrid(display, info)
     window.vLayout.addLayout(buttonsgrid)
 
     # Run
