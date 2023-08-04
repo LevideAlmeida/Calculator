@@ -84,6 +84,9 @@ class ButtonsGrid(QGridLayout):
                 button,
                 self._makeSlot(self._operatorClicked, button))
 
+        if buttonText == '=':
+            self._connectButtonClicked(button, self._eq)
+
     def _makeSlot(self, func, *args, **kwargs):
         @Slot(bool)
         def realSlot(_):
@@ -104,24 +107,56 @@ class ButtonsGrid(QGridLayout):
         self._right = None
         self._op = None
         self.display.clear()
+        self.equation = ''
 
     def _operatorClicked(self, button: Button):
         displayText = self.display.text()
-        print(displayText, type(displayText))
 
         # if user used operator without insert a number
         if displayText != '' and self._left is None:
-            self._left = self.display.text()
+            self._left = displayText
 
             self._left = float(
                 self._left) if '.' in self._left else int(self._left)
 
             print(f'{self._left}', type(self._left))
 
+        if self._left is None and displayText == '':
+            return
+
         self._op = button.text()
         self.equation = f'{self._left} {self._op} '
 
-        if self._left is None and displayText == '':
-            self.equation = 'Expressão mal formada'
-
         self.display.clear()
+
+    def _eq(self):
+        displayText = self.display.text()
+
+        if not isValidNumber(displayText):
+            return
+
+        if self._op is None and self._left is None:
+            self.equation = f'{displayText} = {displayText}'
+            self.display.clear()
+            return
+
+        self._right = displayText
+        self._right = float(
+            self._right) if '.' in self._right else int(self._right)
+
+        self.equation = f'{self._left} {self._op} {self._right}'
+
+        try:
+            print(eval(self.equation), type(eval(self.equation)))
+            result = str(eval(self.equation))
+            self.info.setText(
+                f'{self._left} {self._op} {self._right} = {result}')
+            self.display.clear()
+            self._left = float(result) if '.' in result else int(result)
+            self._right = None
+            self._op = None
+            print(result, type(result))
+
+        except ZeroDivisionError:
+            self.equation = 'Impossivel dividir por zero'
+            self._clear()

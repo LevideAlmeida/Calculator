@@ -23,7 +23,7 @@ if __name__ == '__main__':
     app.setWindowIcon(icon)
 
     # last equation info
-    info = Info('Sua conta')
+    info = Info('')
     window.vLayout.addWidget(info)
 
     # Add Display
