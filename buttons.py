@@ -3,6 +3,7 @@ from variables import SMALL_FONT_SIZE
 from utils import isNumOrDot, isValidNumber
 from PySide6.QtCore import Slot
 from typing import TYPE_CHECKING
+import math
 
 if TYPE_CHECKING:
     from info import Info
@@ -79,13 +80,16 @@ class ButtonsGrid(QGridLayout):
         if buttonText == 'C':
             self._connectButtonClicked(button, self._clear)
 
-        if buttonText in '+-*/':
+        if buttonText in '+-*/^':
             self._connectButtonClicked(
                 button,
                 self._makeSlot(self._operatorClicked, button))
 
         if buttonText == '=':
             self._connectButtonClicked(button, self._eq)
+
+        if buttonText == '◀':
+            self._connectButtonClicked(button, self.display.backspace)
 
     def _makeSlot(self, func, *args, **kwargs):
         @Slot(bool)
@@ -114,12 +118,8 @@ class ButtonsGrid(QGridLayout):
 
         # if user used operator without insert a number
         if displayText != '' and self._left is None:
-            self._left = displayText
-
             self._left = float(
-                self._left) if '.' in self._left else int(self._left)
-
-            print(f'{self._left}', type(self._left))
+                displayText) if '.' in displayText else int(displayText)
 
         if self._left is None and displayText == '':
             return
@@ -145,18 +145,26 @@ class ButtonsGrid(QGridLayout):
             self._right) if '.' in self._right else int(self._right)
 
         self.equation = f'{self._left} {self._op} {self._right}'
+        result = ''
 
         try:
-            print(eval(self.equation), type(eval(self.equation)))
-            result = str(eval(self.equation))
-            self.info.setText(
-                f'{self._left} {self._op} {self._right} = {result}')
-            self.display.clear()
-            self._left = float(result) if '.' in result else int(result)
+            if '^' in self.equation and self._left is not None:
+                result = str(math.pow(self._left, self._right))
+            else:
+                result = str(eval(self.equation))
+
+            self.display.setText(f'{result}')
             self._right = None
             self._op = None
-            print(result, type(result))
+            self._left = float(result) if '.' in result else int(result)
+            self.equation = f'{self._left}'
 
         except ZeroDivisionError:
-            self.equation = 'Impossivel dividir por zero'
             self._clear()
+            self.equation = 'Impossivel dividir por zero'
+        except OverflowError:
+            self._clear()
+            self.equation = 'Incalculavel'
+        except ValueError:
+            self._left = float(result)
+            self.equation = f'{self._left}'
