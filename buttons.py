@@ -51,6 +51,10 @@ class ButtonsGrid(QGridLayout):
         self.info.setText(value)
 
     def _makeGrid(self):
+        self.display.eqPressed.connect(self._eq)
+        self.display.backspacePressed.connect(self.display.backspace)
+        self.display.clearPressed.connect(self._clear)
+
         for i, row in enumerate(self._gridMask):
             for j, button_name in enumerate(row):
                 button = Button(button_name)
@@ -135,27 +139,31 @@ class ButtonsGrid(QGridLayout):
         if not isValidNumber(displayText):
             return
 
-        if self._op is None and self._left is None:
+        if self._op is None:
             self.equation = f'{displayText} = {displayText}'
             self.display.clear()
             return
 
-        self._right = displayText
-        self._right = float(
-            self._right) if '.' in self._right else int(self._right)
+        if self._right is None:
+            self._right = float(
+                displayText) if '.' in displayText else int(displayText)
 
         self.equation = f'{self._left} {self._op} {self._right}'
         result = ''
 
         try:
+
             if '^' in self.equation and self._left is not None:
-                result = str(math.pow(self._left, self._right))
+                result = str(math.pow(self._left, self._right)) + ' '
             else:
-                result = str(eval(self.equation))
+                result = str(eval(self.equation)) + ' '
+
+            if '.0 ' in result:
+                result = result.replace('.0 ', '')
+            else:
+                result = result.replace(' ', '')
 
             self.display.setText(f'{result}')
-            self._right = None
-            self._op = None
             self._left = float(result) if '.' in result else int(result)
             self.equation = f'{self._left}'
 
