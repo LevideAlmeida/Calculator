@@ -13,3 +13,8 @@ def isValidNumber(string: str):
         return True
     except ValueError:
         return False
+
+
+def convertToNumber(string: str):
+    newString = float(string) if '.' in string else int(string)
+    return newString

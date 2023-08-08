@@ -2,12 +2,15 @@ from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import QLineEdit
 from variables import MEDIUM_FONT_SIZE, TEXT_MARGIN, MINIMUN_WIDTH
 from PySide6.QtCore import Qt, Signal
+from utils import isNumOrDot
 
 
 class Display(QLineEdit):
     eqPressed = Signal()
     backspacePressed = Signal()
     clearPressed = Signal()
+    inputPressed = Signal(str)
+    operatorPressed = Signal(str)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,6 +32,9 @@ class Display(QLineEdit):
         isEnter = key in [KEYS.Key_Enter, KEYS.Key_Return, KEYS.Key_Equal]
         isBackspace = key == KEYS.Key_Backspace
         isESC = key == KEYS.Key_Escape
+        isDelete = key == KEYS.Key_Delete
+        isOperator = key in [KEYS.Key_Plus, KEYS.Key_Minus,
+                             KEYS.Key_Slash, KEYS.Key_Asterisk, KEYS.Key_P]
 
         if isEnter:
             self.eqPressed.emit()
@@ -42,7 +48,18 @@ class Display(QLineEdit):
             self.clearPressed.emit()
             return event.ignore()
 
-        if len(text) == 0:
+        elif isOperator:
+            if text.lower() == 'p':
+                text = '^'
+            self.operatorPressed.emit(text)
             return event.ignore()
 
-        print('texto', text)
+        elif isNumOrDot(text):
+            self.inputPressed.emit(text)
+            return event.ignore()
+
+        elif len(text) == 0:
+            return event.ignore()
+
+        elif isDelete:
+            return super().keyPressEvent(event)
